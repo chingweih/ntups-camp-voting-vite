@@ -96,7 +96,7 @@ function App() {
       registered_voters: 13452016,
     },
     ticker_text: '投票時間結束 各開票所陸續回報狀態中',
-    display_mode: 'proportional',
+    display_mode: 'legislative',
   })
 
   return (
