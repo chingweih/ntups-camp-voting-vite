@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import Marquee from 'react-fast-marquee'
+import { useQuery } from 'react-query'
 import { VictoryPie } from 'victory'
 import banner from './assets/banner.png'
 import elected from './assets/elected.svg'
 import logo from './assets/title.png'
 import { Card, CardHeader, CardTitle } from './components/ui/card'
 import { colors } from './lib/custom-colors'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { CloudOff } from 'lucide-react'
 
 type ElectionData = {
   presidential: {
@@ -32,6 +35,22 @@ type ElectionData = {
 function App() {
   const [time, setTime] = useState(new Date())
 
+  const {
+    data: electionData,
+    isError,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['electionData'],
+    queryFn: async () => {
+      const response = await fetch('http://127.0.0.1:5050/data', {
+        method: 'get',
+        mode: 'cors',
+      })
+      return response.json()
+    },
+  })
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       setTime(new Date())
@@ -41,63 +60,29 @@ function App() {
     }
   })
 
-  const [electionData] = useState<ElectionData>({
-    presidential: {
-      candidates: [
-        { name: '唐子涵/吳亞旗', votes: 0 },
-        { name: '張璿婷/陳宣宇', votes: 0 },
-        { name: '鄭大邦/王宇彤', votes: 0 },
-      ],
-    },
-    legislative: {
-      areas: [
-        {
-          area: '選區一',
-          candidates: [
-            { name: '哈囉', votes: 1 },
-            { name: '莊宸綾', votes: 0 },
-            { name: '謝啟昱', votes: 0 },
-          ],
-        },
-        {
-          area: '選區一',
-          candidates: [
-            { name: '哈囉', votes: 0 },
-            { name: '莊宸綾', votes: 0 },
-            { name: '謝啟昱', votes: 0 },
-          ],
-        },
-        {
-          area: '選區一',
-          candidates: [
-            { name: '哈囉', votes: 0 },
-            { name: '莊宸綾', votes: 0 },
-            { name: '謝啟昱', votes: 0 },
-          ],
-        },
-        {
-          area: '選區一',
-          candidates: [
-            { name: '哈囉', votes: 0 },
-            { name: '莊宸綾', votes: 0 },
-            { name: '謝啟昱', votes: 0 },
-          ],
-        },
-      ],
-    },
-    proportional: {
-      seats: {
-        建制派: { seats: 0, percentage: 50 },
-        中間: { seats: 0, percentage: 10 },
-        左派: { seats: 0, percentage: 40 },
-      },
-      total_seats: 10,
-      total_votes: 300,
-      registered_voters: 13452016,
-    },
-    ticker_text: '投票時間結束 各開票所陸續回報狀態中',
-    display_mode: 'legislative',
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      refetch()
+    }, 5000)
+    return () => {
+      clearInterval(intervalId)
+    }
   })
+
+  if (isError) {
+    return (
+      <div className='flex h-full max-h-full w-full items-center justify-center gap-5'>
+        <Alert className='w-96'>
+          <CloudOff className='h-4 w-4 text-red-400' />
+          <AlertTitle>無法取得資料</AlertTitle>
+          <AlertDescription>
+            請在 http://127.0.0.1:5050 開啟後端伺服器，
+            <br />5 秒後將自動重試。
+          </AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -106,15 +91,23 @@ function App() {
           <img src={logo} className='mx-2 h-full max-w-40 p-2' alt='logo' />
           <Marquee className='w-full'>
             <h2 className='text-lg font-semibold'>
-              {electionData.ticker_text}
+              {isLoading ? '2024 臺大政治營' : electionData.ticker_text}
             </h2>
           </Marquee>
         </div>
-        <Legislative electionData={electionData} />
-        <Presidential electionData={electionData} />
-        <Proportional electionData={electionData} />
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <>
+            <Legislative electionData={electionData} />
+            <Presidential electionData={electionData} />
+            <Proportional electionData={electionData} />
+          </>
+        )}
         <div className='flex h-20 items-center gap-5 rounded-md bg-white p-2'>
-          <Marquee className='w-full'>{electionData.ticker_text}</Marquee>
+          <Marquee className='w-full'>
+            {isLoading ? '2024 臺大政治營' : electionData.ticker_text}
+          </Marquee>
           <h2 className='pr-2 text-lg font-bold'>
             {String(time.getHours()).padStart(2, '0')}:
             {String(time.getMinutes()).padStart(2, '0')}
@@ -122,6 +115,14 @@ function App() {
         </div>
       </div>
     </>
+  )
+}
+
+function Loading() {
+  return (
+    <div className='flex h-full max-h-full w-full items-center justify-center gap-5 text-white'>
+      <h1 className='text-4xl font-bold'>載入中...</h1>
+    </div>
   )
 }
 
@@ -237,7 +238,10 @@ function Legislative({ electionData }: { electionData: ElectionData }) {
     <div className='flex h-full w-full items-stretch justify-center gap-5'>
       {electionData.legislative.areas.map((area) => {
         return (
-          <div className='flex flex-grow flex-col justify-center gap-5'>
+          <div
+            className='flex flex-grow flex-col justify-center gap-5'
+            key={area.area}
+          >
             <Card className='w-full'>
               <CardHeader>
                 <CardTitle>{area.area}</CardTitle>
