@@ -41,7 +41,7 @@ function App() {
     }
   })
 
-  const [electionData, setElectionData] = useState<ElectionData>({
+  const [electionData] = useState<ElectionData>({
     presidential: {
       candidates: [
         { name: '唐子涵/吳亞旗', votes: 0 },
