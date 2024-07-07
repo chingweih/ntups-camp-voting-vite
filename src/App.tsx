@@ -35,6 +35,9 @@ type ElectionData = {
 function App() {
   const [time, setTime] = useState(new Date())
 
+  const dataEndpointBaseUrl =
+    localStorage.getItem('flask_url') || 'http://127.0.0.1:5050'
+
   const {
     data: electionData,
     isError,
@@ -43,7 +46,7 @@ function App() {
   } = useQuery({
     queryKey: ['electionData'],
     queryFn: async () => {
-      const response = await fetch('http://127.0.0.1:5050/data', {
+      const response = await fetch(`${dataEndpointBaseUrl}/data`, {
         method: 'get',
         mode: 'cors',
       })
@@ -76,7 +79,7 @@ function App() {
           <CloudOff className='h-4 w-4 text-red-400' />
           <AlertTitle>無法取得資料</AlertTitle>
           <AlertDescription>
-            請在 http://127.0.0.1:5050 開啟後端伺服器，
+            請在 {dataEndpointBaseUrl} 開啟後端伺服器，
             <br />5 秒後將自動重試。
           </AlertDescription>
         </Alert>
