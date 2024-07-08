@@ -1,42 +1,21 @@
-import { useEffect, useState } from 'react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Armchair, CloudOff } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import Marquee from 'react-fast-marquee'
 import { useQuery } from 'react-query'
-import { VictoryPie } from 'victory'
 import banner from './assets/banner.png'
 import elected from './assets/elected.svg'
 import logo from './assets/title.png'
 import { Card, CardHeader, CardTitle } from './components/ui/card'
-import { colors } from './lib/custom-colors'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { CloudOff } from 'lucide-react'
-
-type ElectionData = {
-  presidential: {
-    candidates: { name: string; votes: number }[]
-  }
-  legislative: {
-    areas: {
-      area: string
-      candidates: { name: string; votes: number }[]
-    }[]
-  }
-  proportional: {
-    seats: {
-      [party: string]: { seats: number; percentage: number }
-    }
-    total_seats: number
-    total_votes: number
-    registered_voters: number
-  }
-  ticker_text: string
-  display_mode: 'presidential' | 'legislative' | 'proportional'
-}
+import { Progress } from './components/ui/progress'
+import { Candidate, ElectionData } from './electionData.type'
+import { colors, randomColors } from './lib/custom-colors'
 
 function App() {
   const [time, setTime] = useState(new Date())
 
-  const dataEndpointBaseUrl =
-    localStorage.getItem('flask_url') || 'http://127.0.0.1:5050'
+  const dataEndpointUrl =
+    localStorage.getItem('flask_url') || 'http://127.0.0.1:5050/data'
 
   const {
     data: electionData,
@@ -46,7 +25,7 @@ function App() {
   } = useQuery({
     queryKey: ['electionData'],
     queryFn: async () => {
-      const response = await fetch(`${dataEndpointBaseUrl}/data`, {
+      const response = await fetch(dataEndpointUrl, {
         method: 'get',
         mode: 'cors',
       })
@@ -79,7 +58,7 @@ function App() {
           <CloudOff className='h-4 w-4 text-red-400' />
           <AlertTitle>無法取得資料</AlertTitle>
           <AlertDescription>
-            請在 {dataEndpointBaseUrl} 開啟後端伺服器，
+            請在 {dataEndpointUrl} 開啟後端 API，
             <br />5 秒後將自動重試。
           </AlertDescription>
         </Alert>
@@ -89,13 +68,15 @@ function App() {
 
   return (
     <>
-      <div className='m-0 flex h-full max-h-full w-full flex-col items-stretch justify-center gap-2 overflow-hidden bg-gradient-to-t from-zinc-600 via-zinc-800 to-zinc-900 p-8 text-slate-800'>
+      <div className='m-0 flex h-full max-h-full w-full flex-col items-stretch justify-center gap-5 overflow-hidden bg-gradient-to-t from-zinc-600 via-zinc-800 to-zinc-900 p-8 text-slate-800'>
         <div className='flex h-20 rounded-md bg-white p-2'>
           <img src={logo} className='mx-2 h-full max-w-40 p-2' alt='logo' />
           <Marquee className='w-full'>
-            <h2 className='text-lg font-semibold'>
-              {isLoading ? '2024 臺大政治營' : electionData.ticker_text}
-            </h2>
+            {isLoading ? (
+              <h2 className='text-lg font-semibold'>'2024 臺大政治營'</h2>
+            ) : (
+              <MarqueeContent electionData={electionData} />
+            )}
           </Marquee>
         </div>
         {isLoading ? (
@@ -107,7 +88,7 @@ function App() {
             <Proportional electionData={electionData} />
           </>
         )}
-        <div className='flex h-20 items-center gap-5 rounded-md bg-white p-2'>
+        <div className='flex h-10 items-center gap-5 rounded-md bg-white p-2'>
           <Marquee className='w-full'>
             {isLoading ? '2024 臺大政治營' : electionData.ticker_text}
           </Marquee>
@@ -118,6 +99,37 @@ function App() {
         </div>
       </div>
     </>
+  )
+}
+
+function MarqueeContent({ electionData }: { electionData: ElectionData }) {
+  return (
+    <div className='flex flex-row items-center justify-center gap-5 px-5'>
+      {electionData.legislative.areas.map((area) => {
+        return (
+          <div className='flex flex-row items-center justify-center gap-3'>
+            <h2 className='text-lg font-semibold' key={area.area}>
+              {area.area}
+            </h2>
+            {area.candidates.map((cand, index) => {
+              return (
+                <React.Fragment key={index}>
+                  <div
+                    className='flex h-5 w-5 items-center justify-center rounded-md text-white'
+                    style={{ backgroundColor: randomColors[index] }}
+                  >
+                    {index + 1}
+                  </div>
+                  <h2>
+                    {cand.name} {cand.votes} 票
+                  </h2>
+                </React.Fragment>
+              )
+            })}
+          </div>
+        )
+      })}
+    </div>
   )
 }
 
@@ -151,30 +163,7 @@ function Presidential({ electionData }: { electionData: ElectionData }) {
     <WithBanner>
       <div className='flex w-full flex-col gap-5'>
         {electionData.presidential.candidates.map((cand, index) => {
-          return (
-            <Card key={cand.name} className='h-full w-full py-3'>
-              <CardHeader className='gap-5'>
-                <div className='flex flex-row items-center justify-between'>
-                  <div className='flex flex-row items-center justify-start gap-5'>
-                    <div
-                      className='flex h-10 w-10 items-center justify-center rounded-md p-5 text-white'
-                      style={{ backgroundColor: colors.primaryBlue }}
-                    >
-                      {index + 1}
-                    </div>
-                    <CardTitle>{cand.name}</CardTitle>
-                  </div>
-                  <img src={elected} className='h-6' />
-                </div>
-                <div className='flex flex-row items-center justify-end'>
-                  <CardTitle>
-                    {Math.floor(cand.votes / 10000)} 萬{' '}
-                    {String(cand.votes % 10000).padStart(4, '0')} 票
-                  </CardTitle>
-                </div>
-              </CardHeader>
-            </Card>
-          )
+          return <CandCard cand={cand} index={index} key={cand.name} />
         })}
       </div>
     </WithBanner>
@@ -186,47 +175,60 @@ function Proportional({ electionData }: { electionData: ElectionData }) {
     return null
   }
 
-  const pieData = Object.entries(electionData.proportional.seats).map(
-    ([party, { seats, percentage }]) => ({
-      x: party,
-      y: percentage,
-      seats,
-    }),
+  const parties = Object.entries(electionData.proportional.seats).map(
+    ([party, { seats, percentage }], index) => {
+      return { party, seats, percentage, color: randomColors[index] }
+    },
   )
+
+  const seatFromVotes: string[] = []
+
+  parties.forEach((party) => {
+    seatFromVotes.push(...Array(party.seats).fill(party.color))
+  })
+
+  const seatsColor = Array.from({
+    length: electionData.proportional.total_seats,
+  }).map((_, index) => {
+    if (index <= seatFromVotes.length - 1) {
+      return seatFromVotes[index]
+    } else {
+      return colors.twPrimary
+    }
+  })
 
   return (
     <WithBanner>
-      <div className='relative rounded-md bg-white'>
-        <h2
-          className='absolute left-3 top-3 rounded-md px-5 py-3 text-lg font-bold text-white'
-          style={{ backgroundColor: colors.primaryBlue }}
-        >
-          不分區選舉結果
-        </h2>
-        <VictoryPie
-          data={pieData}
-          labels={({ datum }) =>
-            `${datum.x}：${parseInt(datum.y)}% (${datum.seats})`
-          }
-          labelRadius={50}
-          animate={{
-            duration: 2000,
-          }}
-          colorScale={[
-            colors.primaryBlue,
-            colors.primaryOrgange,
-            'navy',
-            'cyan',
-            'navy',
-          ]}
-          height={550}
-          width={1000}
-          style={{
-            labels: {
-              fill: 'white',
-            },
-          }}
-        />
+      <div className='flex w-full flex-col items-center justify-center gap-10 rounded-md bg-white p-10'>
+        <h2 className='text-2xl font-bold'>不分區開票</h2>
+        <div className='flex flex-row gap-2'>
+          {seatsColor.map((color) => {
+            return <Armchair size={80} color={color} />
+          })}
+        </div>
+        <div className='flex w-full flex-col items-start justify-center gap-3 pt-5'>
+          {parties.map((party) => {
+            return (
+              <div className='flex w-full flex-row items-center justify-between'>
+                <div className='flex w-1/5 flex-row items-center justify-start gap-2'>
+                  <div
+                    className='m-1 h-8 w-8 rounded-full'
+                    style={{ backgroundColor: party.color }}
+                  ></div>
+                  <h2 className='text-lg font-bold'>{party.party}</h2>
+                </div>
+                <Progress
+                  value={party.percentage}
+                  className='w-3/5'
+                  color={party.color}
+                />
+                <p className='text-center'>
+                  {party.seats} 席 / {party.percentage} %
+                </p>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </WithBanner>
   )
@@ -240,46 +242,68 @@ function Legislative({ electionData }: { electionData: ElectionData }) {
   return (
     <div className='flex h-full w-full items-stretch justify-center gap-5'>
       {electionData.legislative.areas.map((area) => {
+        const validVotes = area.candidates.reduce(
+          (acc, curr) => acc + curr.votes,
+          0,
+        )
+        const totalVotes = area.total_votes
+
         return (
           <div
-            className='flex flex-grow flex-col justify-center gap-5'
+            className='flex w-full flex-grow flex-col justify-center gap-5'
             key={area.area}
           >
             <Card className='w-full'>
               <CardHeader>
-                <CardTitle>{area.area}</CardTitle>
+                <div className='flex flex-row items-center justify-between'>
+                  <CardTitle>{area.area}</CardTitle>
+                  <p>
+                    已開{' '}
+                    <span className='text-2xl font-bold'>{validVotes}</span>/
+                    {totalVotes}
+                  </p>
+                </div>
               </CardHeader>
             </Card>
             {area.candidates.map((cand, index) => {
-              return (
-                <Card key={cand.name} className='w-full'>
-                  <CardHeader className='gap-5'>
-                    <div className='flex flex-row items-center justify-between'>
-                      <div className='flex flex-row items-center justify-start gap-5'>
-                        <div
-                          className='flex h-10 w-10 items-center justify-center rounded-md p-5 text-white'
-                          style={{ backgroundColor: colors.primaryBlue }}
-                        >
-                          {index + 1}
-                        </div>
-                        <CardTitle>{cand.name}</CardTitle>
-                      </div>
-                      <img src={elected} className='h-6' />
-                    </div>
-                    <div className='flex flex-row items-center justify-end'>
-                      <CardTitle>
-                        {Math.floor(cand.votes / 10000)} 萬{' '}
-                        {String(cand.votes % 10000).padStart(4, '0')} 票
-                      </CardTitle>
-                    </div>
-                  </CardHeader>
-                </Card>
-              )
+              return <CandCard cand={cand} index={index} key={cand.name} />
             })}
           </div>
         )
       })}
     </div>
+  )
+}
+
+function CandCard({ cand, index }: { cand: Candidate; index: number }) {
+  const bgColor = randomColors[index]
+
+  return (
+    <Card key={cand.name} className='w-full'>
+      <CardHeader className='gap-2'>
+        <div className='flex flex-row items-center justify-between'>
+          <div className='flex flex-row items-center justify-start gap-5'>
+            <div
+              className='flex h-10 w-10 items-center justify-center rounded-md p-5 text-white'
+              style={{ backgroundColor: bgColor }}
+            >
+              {index + 1}
+            </div>
+            <CardTitle>{cand.name}</CardTitle>
+          </div>
+          {cand.elected ? <img src={elected} className='h-6' /> : null}
+        </div>
+        <div className='flex flex-row items-center justify-between'>
+          <div className='flex w-1/2 flex-row items-center justify-start gap-2'>
+            <Progress value={cand.percentage} className='m-0' color={bgColor} />
+            <p>{cand.percentage}%</p>
+          </div>
+          <CardTitle className='m-0'>
+            <span className='text-4xl'>{cand.votes}</span> 票
+          </CardTitle>
+        </div>
+      </CardHeader>
+    </Card>
   )
 }
 
