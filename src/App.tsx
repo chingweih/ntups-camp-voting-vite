@@ -36,14 +36,6 @@ function App() {
   useEffect(() => {
     const intervalId = setInterval(() => {
       setTime(new Date())
-    }, 60000)
-    return () => {
-      clearInterval(intervalId)
-    }
-  })
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
       refetch()
     }, 5000)
     return () => {
@@ -148,6 +140,7 @@ function WithBanner({ children }: { children: React.ReactNode }) {
         src={banner}
         className='rounded-md object-contain'
         style={{ height: 'calc(100vh - 265px)' }}
+        rel='preload'
       />
       {children}
     </div>
@@ -218,12 +211,13 @@ function Proportional({ electionData }: { electionData: ElectionData }) {
                   <h2 className='text-lg font-bold'>{party.party}</h2>
                 </div>
                 <Progress
-                  value={party.percentage}
+                  value={Math.min(party.percentage * 2, 100)}
                   className='w-3/5'
                   color={party.color}
                 />
-                <p className='text-center'>
-                  {party.seats} 席 / {party.percentage} %
+                <p className='text-left'>
+                  <span className='text-2xl font-bold'>{party.seats} 席</span> /{' '}
+                  {party.percentage} %
                 </p>
               </div>
             )
@@ -290,12 +284,16 @@ function CandCard({ cand, index }: { cand: Candidate; index: number }) {
               {index + 1}
             </div>
             <CardTitle>{cand.name}</CardTitle>
+            {cand.elected ? <img src={elected} className='h-8' /> : null}
           </div>
-          {cand.elected ? <img src={elected} className='h-6' /> : null}
         </div>
         <div className='flex flex-row items-center justify-between'>
           <div className='flex w-1/2 flex-row items-center justify-start gap-2'>
-            <Progress value={cand.percentage} className='m-0' color={bgColor} />
+            <Progress
+              value={Math.min(cand.percentage * 2, 100)}
+              className='m-0'
+              color={bgColor}
+            />
             <p>{cand.percentage}%</p>
           </div>
           <CardTitle className='m-0'>
