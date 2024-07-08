@@ -73,7 +73,7 @@ function App() {
           <img src={logo} className='mx-2 h-full max-w-40 p-2' alt='logo' />
           <Marquee className='w-full'>
             {isLoading ? (
-              <h2 className='text-lg font-semibold'>'2024 臺大政治營'</h2>
+              <h2 className='text-lg font-semibold'>2024 臺大政治營</h2>
             ) : (
               <MarqueeContent electionData={electionData} />
             )}
