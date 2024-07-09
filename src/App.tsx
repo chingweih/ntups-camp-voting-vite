@@ -215,7 +215,7 @@ function Proportional({ electionData }: { electionData: ElectionData }) {
                   className='w-3/5'
                   color={party.color}
                 />
-                <p className='text-left'>
+                <p className='w-1/5 px-5 text-left'>
                   <span className='text-2xl font-bold'>{party.seats} 席</span> /{' '}
                   {party.percentage} %
                 </p>
