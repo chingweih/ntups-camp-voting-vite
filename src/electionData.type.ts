@@ -3,6 +3,7 @@ export type Candidate = {
   votes: number
   percentage: number
   elected: boolean
+  picture_url?: string
 }
 
 export type ElectionData = {

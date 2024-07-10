@@ -154,7 +154,7 @@ function Presidential({ electionData }: { electionData: ElectionData }) {
 
   return (
     <WithBanner>
-      <div className='flex w-full flex-col gap-5'>
+      <div className='flex h-full w-full flex-row gap-5'>
         {electionData.presidential.candidates.map((cand, index) => {
           return <CandCard cand={cand} index={index} key={cand.name} />
         })}
@@ -274,7 +274,7 @@ function CandCard({ cand, index }: { cand: Candidate; index: number }) {
 
   return (
     <Card key={cand.name} className='w-full'>
-      <CardHeader className='gap-2'>
+      <CardHeader className='flex h-full flex-col justify-center gap-3'>
         <div className='flex flex-row items-center justify-between'>
           <div className='flex flex-row items-center justify-start gap-5'>
             <div
@@ -287,6 +287,9 @@ function CandCard({ cand, index }: { cand: Candidate; index: number }) {
             {cand.elected ? <img src={elected} className='h-8' /> : null}
           </div>
         </div>
+        {cand.picture_url ? (
+          <img src={cand.picture_url} className='w-full rounded-md' />
+        ) : null}
         <div className='flex flex-row items-center justify-between'>
           <div className='flex w-1/2 flex-row items-center justify-start gap-2'>
             <Progress
