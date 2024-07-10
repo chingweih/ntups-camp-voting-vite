@@ -111,4 +111,5 @@
 
 body * {
   font-family: 'Custom FA Sans', 'Noto Sans TC' !important;
+  transition: all 0.3s ease;
 }

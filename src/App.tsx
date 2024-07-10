@@ -3,7 +3,6 @@ import { Armchair, CloudOff } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import Marquee from 'react-fast-marquee'
 import { useQuery } from 'react-query'
-import banner from './assets/banner.png'
 import elected from './assets/elected.svg'
 import logo from './assets/title.png'
 import { Card, CardHeader, CardTitle } from './components/ui/card'
@@ -135,13 +134,16 @@ function Loading() {
 
 function WithBanner({ children }: { children: React.ReactNode }) {
   return (
-    <div className='flex h-full max-h-full flex-row items-center justify-center gap-5'>
-      <img
-        src={banner}
-        className='rounded-md object-contain'
-        style={{ height: 'calc(100vh - 265px)' }}
-        rel='preload'
-      />
+    <div className='flex h-full flex-row items-center justify-center gap-5'>
+      <video
+        autoPlay
+        loop
+        muted
+        className='h-full w-1/5 rounded-md object-cover'
+        // style={{ maxHeight: '100%' }}
+      >
+        <source src='/banner.mp4' type='video/mp4' />
+      </video>
       {children}
     </div>
   )
@@ -192,7 +194,7 @@ function Proportional({ electionData }: { electionData: ElectionData }) {
 
   return (
     <WithBanner>
-      <div className='flex w-full flex-col items-center justify-center gap-10 rounded-md bg-white p-10'>
+      <div className='flex h-full w-full flex-col items-center justify-center gap-10 rounded-md bg-white p-10'>
         <h2 className='text-2xl font-bold'>不分區開票</h2>
         <div className='flex flex-row gap-2'>
           {seatsColor.map((color) => {
