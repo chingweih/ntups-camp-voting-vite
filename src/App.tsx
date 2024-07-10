@@ -9,6 +9,7 @@ import { Card, CardHeader, CardTitle } from './components/ui/card'
 import { Progress } from './components/ui/progress'
 import { Candidate, ElectionData } from './electionData.type'
 import { colors, randomColors } from './lib/custom-colors'
+import { motion } from 'framer-motion'
 
 function App() {
   const [time, setTime] = useState(new Date())
@@ -36,7 +37,7 @@ function App() {
     const intervalId = setInterval(() => {
       setTime(new Date())
       refetch()
-    }, 5000)
+    }, 1000)
     return () => {
       clearInterval(intervalId)
     }
@@ -73,11 +74,11 @@ function App() {
         {isLoading ? (
           <Loading />
         ) : (
-          <>
+          <Animation electionData={electionData}>
             <Legislative electionData={electionData} />
             <Presidential electionData={electionData} />
             <Proportional electionData={electionData} />
-          </>
+          </Animation>
         )}
         <div className='flex h-10 items-center gap-5 rounded-md bg-white p-2'>
           <Marquee className='w-full'>
@@ -90,6 +91,26 @@ function App() {
         </div>
       </div>
     </>
+  )
+}
+
+function Animation({
+  children,
+  electionData,
+}: {
+  children: React.ReactNode
+  electionData: ElectionData
+}) {
+  return (
+    <motion.div
+      initial={{ y: 5, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ ease: 'easeInOut', duration: 0.5 }}
+      className='h-full'
+      key={electionData.display_mode}
+    >
+      {children}
+    </motion.div>
   )
 }
 
