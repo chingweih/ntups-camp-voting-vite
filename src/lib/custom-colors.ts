@@ -4,10 +4,13 @@ export const colors = {
   darkerBlue: '#2c4a5e',
   pageBackground: '#fffefc',
   twPrimary: 'hsl(213deg 42% 87%)',
+  partyLib: '#AB8DD9',
+  partySocial: '#ED83A2',
+  partyConservative: '#FEEA87',
 }
 
 export const randomColors = [
-  colors.primaryBlue,
-  colors.primaryOrgange,
-  colors.darkerBlue,
+  colors.partyLib,
+  colors.partySocial,
+  colors.partyConservative,
 ]
