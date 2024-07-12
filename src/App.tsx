@@ -10,6 +10,7 @@ import { Progress } from './components/ui/progress'
 import { Candidate, ElectionData } from './electionData.type'
 import { colors, randomColors } from './lib/custom-colors'
 import { motion } from 'framer-motion'
+import CountUp from 'react-countup'
 
 function App() {
   const [time, setTime] = useState(new Date())
@@ -226,7 +227,7 @@ function Proportional({ electionData }: { electionData: ElectionData }) {
           {parties.map((party) => {
             return (
               <div className='flex w-full flex-row items-center justify-between'>
-                <div className='flex w-1/5 flex-row items-center justify-start gap-2'>
+                <div className='flex w-2/6 flex-row items-center justify-start gap-2'>
                   <div
                     className='m-1 h-8 w-8 rounded-full'
                     style={{ backgroundColor: party.color }}
@@ -234,13 +235,15 @@ function Proportional({ electionData }: { electionData: ElectionData }) {
                   <h2 className='text-lg font-bold'>{party.party}</h2>
                 </div>
                 <Progress
-                  value={Math.min(party.percentage * 2, 100)}
+                  value={Math.min(party.percentage * 1.5, 100)}
                   className='w-3/5'
                   color={party.color}
                 />
                 <p className='w-1/5 px-5 text-left'>
-                  <span className='text-2xl font-bold'>{party.seats} 席</span> /{' '}
-                  {party.percentage} %
+                  <span className='text-2xl font-bold'>
+                    <CountUp end={party.seats} duration={2} /> 席
+                  </span>{' '}
+                  / <CountUp end={party.percentage} duration={2} /> %
                 </p>
               </div>
             )
@@ -276,8 +279,10 @@ function Legislative({ electionData }: { electionData: ElectionData }) {
                   <CardTitle>{area.area}</CardTitle>
                   <p>
                     已開{' '}
-                    <span className='text-2xl font-bold'>{validVotes}</span>/
-                    {totalVotes}
+                    <span className='text-2xl font-bold'>
+                      <CountUp end={validVotes} duration={2} />
+                    </span>
+                    /{totalVotes}
                   </p>
                 </div>
               </CardHeader>
@@ -323,7 +328,10 @@ function CandCard({ cand, index }: { cand: Candidate; index: number }) {
             <p>{cand.percentage}%</p>
           </div>
           <CardTitle className='m-0'>
-            <span className='text-4xl'>{cand.votes}</span> 票
+            <span className='text-4xl'>
+              <CountUp end={cand.votes} duration={2} />
+            </span>
+            {'  '}票
           </CardTitle>
         </div>
       </CardHeader>
