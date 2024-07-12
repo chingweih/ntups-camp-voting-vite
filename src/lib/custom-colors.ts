@@ -10,7 +10,7 @@ export const colors = {
 }
 
 export const randomColors = [
-  colors.partyLib,
-  colors.partySocial,
   colors.partyConservative,
+  colors.partySocial,
+  colors.partyLib,
 ]

@@ -227,23 +227,24 @@ function Proportional({ electionData }: { electionData: ElectionData }) {
           {parties.map((party) => {
             return (
               <div className='flex w-full flex-row items-center justify-between'>
-                <div className='flex w-2/6 flex-row items-center justify-start gap-2'>
+                <div className='flex w-3/6 flex-row items-center justify-start gap-2'>
                   <div
                     className='m-1 h-8 w-8 rounded-full'
                     style={{ backgroundColor: party.color }}
                   ></div>
-                  <h2 className='text-lg font-bold'>{party.party}</h2>
+                  <h2 className='text-md font-bold'>{party.party}</h2>
                 </div>
                 <Progress
                   value={Math.min(party.percentage * 1.5, 100)}
-                  className='w-3/5'
+                  className='w-5/6'
                   color={party.color}
                 />
-                <p className='w-1/5 px-5 text-left'>
+                <p className='w-1/6 px-5 text-right'>
                   <span className='text-2xl font-bold'>
                     <CountUp end={party.seats} duration={2} /> 席
                   </span>{' '}
-                  / <CountUp end={party.percentage} duration={2} /> %
+                  <br />
+                  <CountUp end={party.percentage} duration={2} /> %
                 </p>
               </div>
             )
@@ -266,7 +267,6 @@ function Legislative({ electionData }: { electionData: ElectionData }) {
           (acc, curr) => acc + curr.votes,
           0,
         )
-        const totalVotes = area.total_votes
 
         return (
           <div
@@ -281,8 +281,8 @@ function Legislative({ electionData }: { electionData: ElectionData }) {
                     已開{' '}
                     <span className='text-2xl font-bold'>
                       <CountUp end={validVotes} duration={2} />
-                    </span>
-                    /{totalVotes}
+                    </span>{' '}
+                    票
                   </p>
                 </div>
               </CardHeader>
@@ -311,7 +311,7 @@ function CandCard({ cand, index }: { cand: Candidate; index: number }) {
             >
               {index + 1}
             </div>
-            <CardTitle>{cand.name}</CardTitle>
+            <CardTitle className='text-lg'>{cand.name}</CardTitle>
             {cand.elected ? <img src={elected} className='h-8' /> : null}
           </div>
         </div>
