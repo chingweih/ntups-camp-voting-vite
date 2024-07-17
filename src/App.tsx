@@ -179,9 +179,11 @@ function Presidential({ electionData }: { electionData: ElectionData }) {
   return (
     <WithBanner>
       <div className='flex h-full w-full flex-row gap-5'>
-        {electionData.presidential.candidates.map((cand, index) => {
-          return <CandCard cand={cand} index={index} key={cand.name} />
-        })}
+        {electionData.presidential.candidates
+          .sort((a, b) => a.num - b.num)
+          .map((cand) => {
+            return <CandCard cand={cand} key={cand.name} />
+          })}
       </div>
     </WithBanner>
   )
@@ -192,11 +194,11 @@ function Proportional({ electionData }: { electionData: ElectionData }) {
     return null
   }
 
-  const parties = Object.entries(electionData.proportional.seats).map(
-    ([party, { seats, percentage }], index) => {
-      return { party, seats, percentage, color: randomColors[index] }
-    },
-  )
+  const parties = Object.entries(electionData.proportional.seats)
+    .map(([party, props]) => {
+      return { party, ...props }
+    })
+    .sort((a, b) => a.num - b.num)
 
   const seatFromVotes: string[] = []
 
@@ -287,9 +289,11 @@ function Legislative({ electionData }: { electionData: ElectionData }) {
                 </div>
               </CardHeader>
             </Card>
-            {area.candidates.map((cand, index) => {
-              return <CandCard cand={cand} index={index} key={cand.name} />
-            })}
+            {area.candidates
+              .sort((a, b) => a.num - b.num)
+              .map((cand) => {
+                return <CandCard cand={cand} key={cand.name} />
+              })}
           </div>
         )
       })}
@@ -297,9 +301,7 @@ function Legislative({ electionData }: { electionData: ElectionData }) {
   )
 }
 
-function CandCard({ cand, index }: { cand: Candidate; index: number }) {
-  const bgColor = randomColors[index]
-
+function CandCard({ cand }: { cand: Candidate }) {
   return (
     <Card key={cand.name} className='w-full'>
       <CardHeader className='flex h-full flex-col justify-center gap-3'>
@@ -307,9 +309,9 @@ function CandCard({ cand, index }: { cand: Candidate; index: number }) {
           <div className='flex flex-row items-center justify-start gap-5'>
             <div
               className='flex h-10 w-10 items-center justify-center rounded-md p-5 text-white'
-              style={{ backgroundColor: bgColor }}
+              style={{ backgroundColor: cand.color }}
             >
-              {index + 1}
+              {cand.num}
             </div>
             <CardTitle className='text-lg'>{cand.name}</CardTitle>
             {cand.elected ? <img src={elected} className='h-8' /> : null}
@@ -323,7 +325,7 @@ function CandCard({ cand, index }: { cand: Candidate; index: number }) {
             <Progress
               value={Math.min(cand.percentage * 2, 100)}
               className='m-0'
-              color={bgColor}
+              color={cand.color}
             />
             <p>{cand.percentage}%</p>
           </div>

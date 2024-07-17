@@ -4,6 +4,8 @@ export type Candidate = {
   percentage: number
   elected: boolean
   picture_url?: string
+  num: number
+  color: string
 }
 
 export type ElectionData = {
@@ -20,7 +22,12 @@ export type ElectionData = {
   }
   proportional: {
     seats: {
-      [party: string]: { seats: number; percentage: number }
+      [party: string]: {
+        seats: number
+        percentage: number
+        num: number
+        color: string
+      }
     }
     total_seats: number
     total_votes: number
