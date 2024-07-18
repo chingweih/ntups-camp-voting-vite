@@ -1,6 +1,8 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { motion } from 'framer-motion'
 import { Armchair, CloudOff } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import CountUp from 'react-countup'
 import Marquee from 'react-fast-marquee'
 import { useQuery } from 'react-query'
 import elected from './assets/elected.svg'
@@ -8,9 +10,7 @@ import logo from './assets/title.png'
 import { Card, CardHeader, CardTitle } from './components/ui/card'
 import { Progress } from './components/ui/progress'
 import { Candidate, ElectionData } from './electionData.type'
-import { colors, randomColors } from './lib/custom-colors'
-import { motion } from 'framer-motion'
-import CountUp from 'react-countup'
+import { colors } from './lib/custom-colors'
 
 function App() {
   const [time, setTime] = useState(new Date())
@@ -124,21 +124,23 @@ function MarqueeContent({ electionData }: { electionData: ElectionData }) {
             <h2 className='text-lg font-semibold' key={area.area}>
               {area.area}
             </h2>
-            {area.candidates.map((cand, index) => {
-              return (
-                <React.Fragment key={index}>
-                  <div
-                    className='flex h-5 w-5 items-center justify-center rounded-md text-white'
-                    style={{ backgroundColor: randomColors[index] }}
-                  >
-                    {index + 1}
-                  </div>
-                  <h2>
-                    {cand.name} {cand.votes} 票
-                  </h2>
-                </React.Fragment>
-              )
-            })}
+            {area.candidates
+              .sort((a, b) => a.num - b.num)
+              .map((cand, index) => {
+                return (
+                  <React.Fragment key={index}>
+                    <div
+                      className='flex h-5 w-5 items-center justify-center rounded-md text-white'
+                      style={{ backgroundColor: cand.color }}
+                    >
+                      {index + 1}
+                    </div>
+                    <h2>
+                      {cand.name} {cand.votes} 票
+                    </h2>
+                  </React.Fragment>
+                )
+              })}
           </div>
         )
       })}
