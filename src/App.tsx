@@ -315,7 +315,7 @@ function CandCard({ cand }: { cand: Candidate }) {
             >
               {cand.num}
             </div>
-            <CardTitle className='text-lg'>{cand.name}</CardTitle>
+            <CardTitle className='text-3xl'>{cand.name}</CardTitle>
             {cand.elected ? <img src={elected} className='h-8' /> : null}
           </div>
         </div>
