@@ -248,7 +248,7 @@ function Proportional({ electionData }: { electionData: ElectionData }) {
                     <CountUp end={party.seats} duration={2} /> 席
                   </span>{' '}
                   <br />
-                  <CountUp end={party.percentage} duration={2} /> %
+                  <CountUp end={party.percentage} decimals={2} duration={2} /> %
                 </p>
               </div>
             )
